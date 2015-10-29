@@ -87,7 +87,7 @@ public class SlideLayout extends FrameLayout {
                 break;
             case MotionEvent.ACTION_MOVE:
                 int rightMovedX = mLastMotionX - (int) event.getX();
-                if (getScrollX() + rightMovedX >= 0) {
+                if (getScrollX() + rightMovedX >= 0) {// 左侧即将滑出屏幕
                     scrollTo(0, 0);
                 } else if ((int) event.getX() > mMinX) {// 手指处于屏幕边缘时不处理滑动
                     scrollBy(rightMovedX, 0);
