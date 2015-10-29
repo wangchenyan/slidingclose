@@ -1,4 +1,4 @@
-package me.wcy.slideanim;
+package me.wcy.slideclose;
 
 import android.os.Bundle;
 import android.view.View;
