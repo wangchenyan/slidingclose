@@ -1,15 +1,15 @@
-package me.wcy.slideclose;
+package me.wcy.slidingclose;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-public class SlideActivity extends AppCompatActivity {
+public class SlidingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SlideLayout rootView = new SlideLayout(this);
+        SlidingLayout rootView = new SlidingLayout(this);
         rootView.bindActivity(this);
     }
 

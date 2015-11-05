@@ -1,4 +1,4 @@
-package me.wcy.slideclose;
+package me.wcy.slidingclose;
 
 import android.app.Activity;
 import android.graphics.Canvas;
@@ -13,7 +13,7 @@ import android.widget.Scroller;
 /**
  * Created by chenyan.wang on 2015/10/29.
  */
-public class SlideLayout extends FrameLayout {
+public class SlidingLayout extends FrameLayout {
     private Activity mActivity;
     private Scroller mScroller;
     /**
@@ -45,15 +45,15 @@ public class SlideLayout extends FrameLayout {
      */
     private boolean mIsFinish;
 
-    public SlideLayout(Activity activity) {
+    public SlidingLayout(Activity activity) {
         this(activity, null);
     }
 
-    public SlideLayout(Activity activity, AttributeSet attrs) {
+    public SlidingLayout(Activity activity, AttributeSet attrs) {
         this(activity, attrs, 0);
     }
 
-    public SlideLayout(Activity activity, AttributeSet attrs, int defStyleAttr) {
+    public SlidingLayout(Activity activity, AttributeSet attrs, int defStyleAttr) {
         super(activity, attrs, defStyleAttr);
         initView(activity);
     }

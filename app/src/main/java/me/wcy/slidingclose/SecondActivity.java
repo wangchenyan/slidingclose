@@ -1,11 +1,11 @@
-package me.wcy.slideclose;
+package me.wcy.slidingclose;
 
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class SecondActivity extends SlideActivity implements View.OnClickListener {
+public class SecondActivity extends SlidingActivity implements View.OnClickListener {
     private Button button;
 
     @Override
