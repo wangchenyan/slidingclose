@@ -23,7 +23,7 @@ public class SlidingLayout extends FrameLayout {
     /**
      * 屏幕宽度
      */
-    private int mWidth;
+    private int mWidth = -1;
     /**
      * 可滑动的最小X坐标，小于该坐标的滑动不处理
      */
@@ -40,10 +40,6 @@ public class SlidingLayout extends FrameLayout {
      * 页面边缘阴影的宽度
      */
     private int mShadowWidth;
-    /**
-     * Activity finish标识符
-     */
-    private boolean mIsFinish;
 
     public SlidingLayout(Activity activity) {
         this(activity, null);
@@ -97,10 +93,8 @@ public class SlidingLayout extends FrameLayout {
             case MotionEvent.ACTION_UP:
                 if (-getScrollX() < mWidth / 2) {
                     scrollBack();
-                    mIsFinish = false;
                 } else {
                     scrollClose();
-                    mIsFinish = true;
                 }
                 break;
         }
@@ -132,7 +126,7 @@ public class SlidingLayout extends FrameLayout {
         if (mScroller.computeScrollOffset()) {
             scrollTo(mScroller.getCurrX(), 0);
             postInvalidate();
-        } else if (mIsFinish) {
+        } else if (-getScrollX() == mWidth) {
             mActivity.finish();
         }
         super.computeScroll();

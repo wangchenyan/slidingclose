@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">SlideClose</string>
+    <string name="app_name">SlidingClose</string>
     <string name="title_activity_second">SecondActivity</string>
 </resources>
