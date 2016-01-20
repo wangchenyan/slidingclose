@@ -142,15 +142,15 @@ public class SlidingLayout extends FrameLayout {
      * 绘制边缘的阴影
      */
     private void drawShadow(Canvas canvas) {
-        //保存画布当前的状态
+        // 保存画布当前的状态
         canvas.save();
-        //设置drawable的大小范围
+        // 设置drawable的大小范围
         mLeftShadow.setBounds(0, 0, mShadowWidth, getHeight());
-        //让画布平移一定距离
+        // 让画布平移一定距离
         canvas.translate(-mShadowWidth, 0);
-        //绘制Drawable
+        // 绘制Drawable
         mLeftShadow.draw(canvas);
-        //恢复画布的状态
+        // 恢复画布的状态
         canvas.restore();
     }
 }
