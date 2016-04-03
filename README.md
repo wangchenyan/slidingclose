@@ -236,3 +236,19 @@ startActivity和finish添加了滑动动画。
 > 我在这里遇到一个问题，设置透明主题后，在style中设置Activity切换动画无效，因此这里只好在代码中添加动画。知道原因的朋友还请不吝赐教。
 
 主要代码就这么多，这里考虑到了扩展性，因此使用是非常简单的。如果想要滑动关闭Activity，就设置透明主题，继承SlideActivity就可以了。
+
+## License
+
+    Copyright 2016 Chay Wong
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
