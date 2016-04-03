@@ -8,7 +8,7 @@
 ![](https://github.com/ChanWong21/SlideClose/blob/master/art/screenshot.gif)
 
 ## 源码解析
-1. 配置透明主题
+### 配置透明主题
 要想Activity滑出屏幕后不遮挡下层Activity，需设置透明主题
 ```grove
 <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -22,7 +22,7 @@
 ```
 添加后3条即可，当然直接用Android自带透明主题也是可以的。
 
-2. SlideLayout
+### SlideLayout
 重写了FrameLayout，主要是处理滑动时的逻辑。
 ```java
 package me.wcy.slideanim;
@@ -192,15 +192,15 @@ public class SlideLayout extends FrameLayout {
 * bindActivity：绑定Activity的界面，这段代码很简单。
 * 通过重写onTouchEvent处理滑动逻辑。（注意，为什么不是重写dispatchTouchEvent或interceptTouchEvnet？）
 
-> ACTION_DOWN：主要是记录了屏幕的宽度
-> ACTION_MOVE：分两种情况，①view的x坐标为0，即初始状态，这时只能向右滑动，禁止向左滑动。②view的坐标大于0，即view的一部分已经划出屏幕（当然是向右滑）。这时，如果继续向右滑则不用多考虑；如果向左滑，就要假设view向左滑动了x后，如果view左边缘还在屏幕内，则可以继续滑动，否则，view左边缘可能已经滑出屏幕，这是我们不想看到的，因此我们直接把view滑动到(0,0)位置。
-> ACTION_UP：手指释放后，如果滑动距离超过屏幕的一半，就关闭Activity，否则，恢复原来状态。
+> ACTION_DOWN：主要是记录了屏幕的宽度<br>
+ACTION_MOVE：分两种情况，①view的x坐标为0，即初始状态，这时只能向右滑动，禁止向左滑动。②view的坐标大于0，即view的一部分已经划出屏幕（当然是向右滑）。这时，如果继续向右滑则不用多考虑；如果向左滑，就要假设view向左滑动了x后，如果view左边缘还在屏幕内，则可以继续滑动，否则，view左边缘可能已经滑出屏幕，这是我们不想看到的，因此我们直接把view滑动到(0,0)位置。<br>
+ACTION_UP：手指释放后，如果滑动距离超过屏幕的一半，就关闭Activity，否则，恢复原来状态。
 
 * 这里用Scroller来处理手指释放后的滑动操作，本文中Scroller不是重点，因此不过多介绍。
 * 出于交互友好考虑，这里保留了屏幕最左边的一块区域不能滑动，即mMinX = mWidth / 10;
 * drawShadow：页面滑出屏幕后左侧添加阴影区域，增加层次感。在dispatchDraw中调用。
 
-3. SlideActivity
+### SlideActivity
 继承自AppCompatActivity，作为滑动关闭Activity的基类，主要是做了绑定操作。
 ```java
 package me.wcy.slideanim;
