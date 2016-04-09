@@ -10,7 +10,7 @@
 ## 源码解析
 ### 配置透明主题
 要想Activity滑出屏幕后不遮挡下层Activity，需设置透明主题
-```grove
+```
 <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
     <item name="colorPrimary">@color/colorPrimary</item>
     <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
