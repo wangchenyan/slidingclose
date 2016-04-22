@@ -15,6 +15,7 @@
     <item name="colorPrimary">@color/colorPrimary</item>
     <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
     <item name="colorAccent">@color/colorAccent</item>
+    <!--Required-->
     <item name="android:windowBackground">@android:color/transparent</item>
     <item name="android:windowIsTranslucent">true</item>
     <item name="android:windowAnimationStyle">@android:style/Animation</item>
@@ -221,13 +222,13 @@ public class SlideActivity extends AppCompatActivity {
     @Override
     public void startActivityForResult(Intent intent, int requestCode, Bundle options) {
         super.startActivityForResult(intent, requestCode, options);
-        overridePendingTransition(R.anim.anim_open, R.anim.anim_close);
+        overridePendingTransition(R.anim.anim_enter, R.anim.anim_exit);
     }
 
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.anim_open, R.anim.anim_close);
+        overridePendingTransition(R.anim.anim_enter, R.anim.anim_exit);
     }
 }
 ```

@@ -16,13 +16,13 @@ public class SlidingActivity extends AppCompatActivity {
     @Override
     public void startActivityForResult(Intent intent, int requestCode, Bundle options) {
         super.startActivityForResult(intent, requestCode, options);
-        overridePendingTransition(R.anim.anim_open, R.anim.anim_close);
+        overridePendingTransition(R.anim.anim_enter, R.anim.anim_exit);
     }
 
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.anim_open, R.anim.anim_close);
+        overridePendingTransition(R.anim.anim_enter, R.anim.anim_exit);
     }
 
 }
