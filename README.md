@@ -26,21 +26,6 @@
 ### SlideLayout
 重写了FrameLayout，主要是处理滑动时的逻辑。
 ```java
-package me.wcy.slideanim;
-
-import android.app.Activity;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.Scroller;
-
-/**
- * Created by chenyan.wang on 2015/10/29.
- */
 public class SlideLayout extends FrameLayout {
     private Activity mActivity;
     private Scroller mScroller;
@@ -204,12 +189,6 @@ ACTION_UP：手指释放后，如果滑动距离超过屏幕的一半，就关�
 ### SlideActivity
 继承自AppCompatActivity，作为滑动关闭Activity的基类，主要是做了绑定操作。
 ```java
-package me.wcy.slideanim;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-
 public class SlideActivity extends AppCompatActivity {
 
     @Override
