@@ -3,7 +3,7 @@
 
 大概效果就是， Activity 向右滑动，滑动超过屏幕的一半，就关闭，否则，恢复原来的状态。
 
-解决了滑动冲突。
+解决了**滑动冲突**。
 
 * 项目地址：https://github.com/ChanWong21/SlidingClose
 * 有问题可以提Issues
