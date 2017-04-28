@@ -5,7 +5,7 @@
 
 解决了**滑动冲突**。
 
-* 项目地址：https://github.com/ChanWong21/SlidingClose
+* 项目地址：https://github.com/wangchenyan/SlidingClose
 * 有问题可以提Issues
 
 ## 截图
@@ -222,7 +222,7 @@ public class SlidingLayout extends FrameLayout {
 - 滑动过程中如果 View 即将滑出屏幕左侧，则直接把 View 滑动到 (0,0) 位置。
 - 手指释放后，如果滑动距离超过屏幕的一半，则关闭 Activity ，否则，恢复原来状态。
 - 使用 `Scroller` 来处理手指释放后的滑动操作。
-* 在 `dispatchDraw` 中绘制 View 左侧的阴影，增加层次感。
+- 在 `dispatchDraw` 中绘制 View 左侧的阴影，增加层次感。
 
 ### SlideActivity
 继承自 AppCompatActivity ，作为滑动关闭 Activity 的基类，主要是做了绑定操作。
