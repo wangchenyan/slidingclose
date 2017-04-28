@@ -9,7 +9,7 @@
 * 有问题可以提Issues
 
 ## 截图
-![](https://raw.githubusercontent.com/ChanWong21/SlidingClose/master/art/screenshot.gif)
+![](https://raw.githubusercontent.com/wangchenyan/SlidingClose/master/art/screenshot.gif)
 
 ## 源码解析
 ### 配置透明主题
