@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">SlidingClose</string>
-    <string name="title_activity_second">SecondActivity</string>
+    <string name="title_activity_view_pager">ViewPagerActivity</string>
+    <string name="title_activity_list_view">ListViewActivity</string>
+    <string name="title_activity_normal">NormalActivity</string>
 </resources>

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class MainActivity extends SlidingActivity implements View.OnClickListener {
+public class MainActivity extends SlidingActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -13,12 +13,16 @@ public class MainActivity extends SlidingActivity implements View.OnClickListene
         setContentView(R.layout.activity_main);
 
         Button button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(this);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, ViewPagerActivity.class));
+            }
+        });
     }
 
     @Override
-    public void onClick(View v) {
-        Intent intent = new Intent(this, SecondActivity.class);
-        startActivity(intent);
+    protected boolean enableSliding() {
+        return false;
     }
 }

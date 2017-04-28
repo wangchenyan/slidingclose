@@ -1,6 +1,10 @@
 # SlidingClose
-向右滑动关闭界面（仿iOS）<br>
-大概效果就是，Activity向右滑动，滑动超过屏幕的一半，就关闭，否则，恢复原来的状态。<br>
+向右滑动关闭界面（仿iOS）
+
+大概效果就是， Activity 向右滑动，滑动超过屏幕的一半，就关闭，否则，恢复原来的状态。
+
+解决了滑动冲突。
+
 * 项目地址：https://github.com/ChanWong21/SlidingClose
 * 有问题可以提Issues
 
@@ -9,73 +13,69 @@
 
 ## 源码解析
 ### 配置透明主题
-要想Activity滑出屏幕后不遮挡下层Activity，需设置透明主题
+要想 Activity 滑出屏幕后不遮挡下层 Activity ，需设置透明主题
 ```
 <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
     <item name="colorPrimary">@color/colorPrimary</item>
     <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
     <item name="colorAccent">@color/colorAccent</item>
+</style>
+
+<style name="AppTheme.Slide" parent="@style/AppTheme">
     <!--Required-->
     <item name="android:windowBackground">@android:color/transparent</item>
     <item name="android:windowIsTranslucent">true</item>
-    <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    <item name="android:windowAnimationStyle">@style/AppTheme.Slide.Animation</item>
+</style>
+
+<style name="AppTheme.Slide.Animation" parent="@android:style/Animation.Activity">
+    <item name="android:activityOpenEnterAnimation">@anim/anim_slide_in</item>
+    <item name="android:activityOpenExitAnimation">@anim/anim_slide_out</item>
+    <item name="android:activityCloseEnterAnimation">@anim/anim_slide_in</item>
+    <item name="android:activityCloseExitAnimation">@anim/anim_slide_out</item>
 </style>
 ```
-添加后3条即可，当然直接用Android自带透明主题也是可以的。
+如果需要滑动关闭则指定 Activity 的 theme 为 `AppTheme.Slide` ，否则使用 `AppTheme` 。
+
+这里也添加了 Activity 切换动画，增强体验。
 
 ### SlideLayout
-重写了FrameLayout，主要是处理滑动时的逻辑。
-```java
-public class SlideLayout extends FrameLayout {
+继承自 FrameLayout ，主要是处理滑动逻辑和滑动冲突。
+```
+public class SlidingLayout extends FrameLayout {
+    // 页面边缘阴影的宽度默认值
+    private static final int SHADOW_WIDTH = 16;
     private Activity mActivity;
     private Scroller mScroller;
-    /**
-     * 上次ACTION_MOVE时的X坐标
-     */
-    private int mLastMotionX;
-    /**
-     * 屏幕宽度
-     */
-    private int mWidth;
-    /**
-     * 可滑动的最小X坐标，小于该坐标的滑动不处理
-     */
-    private int mMinX;
-    /**
-     * 页面边缘的阴影图
-     */
+    // 页面边缘的阴影图
     private Drawable mLeftShadow;
-    /**
-     * 页面边缘阴影的宽度默认值
-     */
-    private static final int SHADOW_WIDTH = 16;
-    /**
-     * 页面边缘阴影的宽度
-     */
+    // 页面边缘阴影的宽度
     private int mShadowWidth;
-    /**
-     * Activity finish标识符
-     */
-    private boolean mIsFinish;
+    private int mInterceptDownX;
+    private int mLastInterceptX;
+    private int mLastInterceptY;
+    private int mTouchDownX;
+    private int mLastTouchX;
+    private int mLastTouchY;
+    private boolean isConsumed = false;
 
-    public SlideLayout(Activity activity) {
-        this(activity, null);
+    public SlidingLayout(Context context) {
+        this(context, null);
     }
 
-    public SlideLayout(Activity activity, AttributeSet attrs) {
-        this(activity, attrs, 0);
+    public SlidingLayout(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
     }
 
-    public SlideLayout(Activity activity, AttributeSet attrs, int defStyleAttr) {
-        super(activity, attrs, defStyleAttr);
-        initView(activity);
+    public SlidingLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        initView(context);
     }
 
-    private void initView(Activity activity) {
-        mActivity = activity;
-        mScroller = new Scroller(mActivity);
+    private void initView(Context context) {
+        mScroller = new Scroller(context);
         mLeftShadow = getResources().getDrawable(R.drawable.left_shadow);
-        int density = (int) activity.getResources().getDisplayMetrics().density;
+        int density = (int) getResources().getDisplayMetrics().density;
         mShadowWidth = SHADOW_WIDTH * density;
     }
 
@@ -83,7 +83,8 @@ public class SlideLayout extends FrameLayout {
      * 绑定Activity
      */
     public void bindActivity(Activity activity) {
-        ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
+        mActivity = activity;
+        ViewGroup decorView = (ViewGroup) mActivity.getWindow().getDecorView();
         View child = decorView.getChildAt(0);
         decorView.removeView(child);
         addView(child);
@@ -91,29 +92,75 @@ public class SlideLayout extends FrameLayout {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        boolean intercept = false;
+        int x = (int) ev.getX();
+        int y = (int) ev.getY();
+        switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                mLastMotionX = (int) event.getX();
-                mWidth = getWidth();
-                mMinX = mWidth / 10;
+                intercept = false;
+                mInterceptDownX = x;
+                mLastInterceptX = x;
+                mLastInterceptY = y;
                 break;
             case MotionEvent.ACTION_MOVE:
-                int rightMovedX = mLastMotionX - (int) event.getX();
-                if (getScrollX() + rightMovedX >= 0) {// 左侧即将滑出屏幕
-                    scrollTo(0, 0);
-                } else if ((int) event.getX() > mMinX) {// 手指处于屏幕边缘时不处理滑动
-                    scrollBy(rightMovedX, 0);
+                int deltaX = x - mLastInterceptX;
+                int deltaY = y - mLastInterceptY;
+                // 手指处于屏幕边缘，且横向滑动距离大于纵向滑动距离时，拦截事件
+                if (mInterceptDownX < (getWidth() / 10) && Math.abs(deltaX) > Math.abs(deltaY)) {
+                    intercept = true;
+                } else {
+                    intercept = false;
                 }
-                mLastMotionX = (int) event.getX();
+                mLastInterceptX = x;
+                mLastInterceptY = y;
                 break;
             case MotionEvent.ACTION_UP:
-                if (-getScrollX() < mWidth / 2) {
+                intercept = false;
+                mInterceptDownX = mLastInterceptX = mLastInterceptY = 0;
+                break;
+        }
+        return intercept;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        int x = (int) ev.getX();
+        int y = (int) ev.getY();
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mTouchDownX = x;
+                mLastTouchX = x;
+                mLastTouchY = y;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                int deltaX = x - mLastTouchX;
+                int deltaY = y - mLastTouchY;
+
+                if (!isConsumed && mTouchDownX < (getWidth() / 10) && Math.abs(deltaX) > Math.abs(deltaY)) {
+                    isConsumed = true;
+                }
+
+                if (isConsumed) {
+                    int rightMovedX = mLastTouchX - (int) ev.getX();
+                    // 左侧即将滑出屏幕
+                    if (getScrollX() + rightMovedX >= 0) {
+                        scrollTo(0, 0);
+                    } else {
+                        scrollBy(rightMovedX, 0);
+                    }
+                }
+                mLastTouchX = x;
+                mLastTouchY = y;
+                break;
+            case MotionEvent.ACTION_UP:
+                isConsumed = false;
+                mTouchDownX = mLastTouchX = mLastTouchY = 0;
+                // 根据手指释放时的位置决定回弹还是关闭
+                if (-getScrollX() < getWidth() / 2) {
                     scrollBack();
-                    mIsFinish = false;
                 } else {
                     scrollClose();
-                    mIsFinish = true;
                 }
                 break;
         }
@@ -135,7 +182,7 @@ public class SlideLayout extends FrameLayout {
      */
     private void scrollClose() {
         int startX = getScrollX();
-        int dx = -getScrollX() - mWidth;
+        int dx = -getScrollX() - getWidth();
         mScroller.startScroll(startX, 0, dx, 0, 300);
         invalidate();
     }
@@ -145,10 +192,9 @@ public class SlideLayout extends FrameLayout {
         if (mScroller.computeScrollOffset()) {
             scrollTo(mScroller.getCurrX(), 0);
             postInvalidate();
-        } else if (mIsFinish) {
+        } else if (-getScrollX() >= getWidth()) {
             mActivity.finish();
         }
-        super.computeScroll();
     }
 
     @Override
@@ -161,65 +207,53 @@ public class SlideLayout extends FrameLayout {
      * 绘制边缘的阴影
      */
     private void drawShadow(Canvas canvas) {
-        // 保存画布当前的状态
-        canvas.save();
-        // 设置drawable的大小范围
         mLeftShadow.setBounds(0, 0, mShadowWidth, getHeight());
-        // 让画布平移一定距离
+        canvas.save();
         canvas.translate(-mShadowWidth, 0);
-        // 绘制Drawable
         mLeftShadow.draw(canvas);
-        // 恢复画布的状态
         canvas.restore();
     }
 }
 ```
 
-* bindActivity：绑定Activity的界面，这段代码很简单。
-* 通过重写onTouchEvent处理滑动逻辑。（注意，为什么不是重写dispatchTouchEvent或interceptTouchEvnet？）
-
-> ACTION_DOWN：主要是记录了屏幕的宽度<br>
-ACTION_MOVE：分两种情况，①view的x坐标为0，即初始状态，这时只能向右滑动，禁止向左滑动。②view的坐标大于0，即view的一部分已经划出屏幕（当然是向右滑）。这时，如果继续向右滑则不用多考虑；如果向左滑，就要假设view向左滑动了x后，如果view左边缘还在屏幕内，则可以继续滑动，否则，view左边缘可能已经滑出屏幕，这是我们不想看到的，因此我们直接把view滑动到(0,0)位置。<br>
-ACTION_UP：手指释放后，如果滑动距离超过屏幕的一半，就关闭Activity，否则，恢复原来状态。
-
-* 这里用Scroller来处理手指释放后的滑动操作，本文中Scroller不是重点，因此不过多介绍。
-* 出于交互友好考虑，这里保留了屏幕最左边的一块区域不能滑动，即mMinX = mWidth / 10;
-* drawShadow：页面滑出屏幕后左侧添加阴影区域，增加层次感。在dispatchDraw中调用。
+重写 `onInterceptTouchEvent` 和 `onTouchEvent` 处理滑动逻辑和滑动冲突。
+- 当有子 View 消费 Touch 事件时，事件会经过 SlidingLayout 的 onInterceptTouchEvent 。当手指在屏幕边缘按下（`mTouchDownX < (getWidth() / 10)`），且横向滑动距离大于纵向滑动距离，则拦截事件，交由 onTouchEvent 处理。
+- 当没有子 View 消费 Touch 事件时，事件会直接回传到 SlidingLayout 的 onTouchEvent 中，这时需要在 onTouchEvent 中判断是否需要消费该事件，条件同上。
+- 滑动过程中如果 View 即将滑出屏幕左侧，则直接把 View 滑动到 (0,0) 位置。
+- 手指释放后，如果滑动距离超过屏幕的一半，则关闭 Activity ，否则，恢复原来状态。
+- 使用 `Scroller` 来处理手指释放后的滑动操作。
+* 在 `dispatchDraw` 中绘制 View 左侧的阴影，增加层次感。
 
 ### SlideActivity
-继承自AppCompatActivity，作为滑动关闭Activity的基类，主要是做了绑定操作。
-```java
-public class SlideActivity extends AppCompatActivity {
+继承自 AppCompatActivity ，作为滑动关闭 Activity 的基类，主要是做了绑定操作。
+```
+public class SlidingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SlideLayout rootView = new SlideLayout(this);
-        rootView.bindActivity(this);
+        if (enableSliding()) {
+            SlidingLayout rootView = new SlidingLayout(this);
+            rootView.bindActivity(this);
+        }
     }
 
-    @Override
-    public void startActivityForResult(Intent intent, int requestCode, Bundle options) {
-        super.startActivityForResult(intent, requestCode, options);
-        overridePendingTransition(R.anim.anim_enter, R.anim.anim_exit);
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.anim_enter, R.anim.anim_exit);
+    protected boolean enableSliding() {
+        return true;
     }
 }
 ```
-startActivity和finish添加了滑动动画。
+如果不需要滑动关闭，则重写 `enableSliding` 并返回 false 。
 
-> 我在这里遇到一个问题，设置透明主题后，在style中设置Activity切换动画无效，因此这里只好在代码中添加动画。知道原因的朋友还请不吝赐教。
-
-主要代码就这么多，这里考虑到了扩展性，因此使用是非常简单的。如果想要滑动关闭Activity，就设置透明主题，继承SlideActivity就可以了。
+## 使用
+- 下载源码。
+- 将 Activity 的基类继承 SlideActivity 。
+- 将需要滑动关闭的 Activity 的 theme 指定为 `AppTheme.Slide` 。
+- 将不需要滑动关闭的 Activity （如 App 主界面）的 theme 指定为 `AppTheme` ，重写 `enableSliding` 并返回 false 。
 
 ## License
 
-    Copyright 2016 Chay Wong
+    Copyright 2016 wangchenyan
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
