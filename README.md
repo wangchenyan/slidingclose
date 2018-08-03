@@ -1,4 +1,4 @@
-# SlidingClose
+# slidingclose
 向右滑动关闭界面（仿iOS）
 
 > 该项目只作为学习参考，不具有实际应用的意义，不建议大家直接拿来使用。
@@ -7,11 +7,11 @@
 
 解决了**滑动冲突**。
 
-* 项目地址：https://github.com/wangchenyan/SlidingClose
+* 项目地址：https://github.com/wangchenyan/slidingclose
 * 有问题可以提Issues
 
 ## 截图
-![](https://raw.githubusercontent.com/wangchenyan/SlidingClose/master/art/screenshot.gif)
+![](https://raw.githubusercontent.com/wangchenyan/slidingclose/master/art/screenshot.gif)
 
 ## 源码解析
 ### 配置透明主题
